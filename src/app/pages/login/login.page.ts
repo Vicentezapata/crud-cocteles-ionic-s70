@@ -6,6 +6,7 @@ import { IonContent, IonHeader, IonTitle, IonToolbar,IonCard, IonCardHeader, Ion
   IonRow, IonCol, IonText } from '@ionic/angular/standalone';
 
 import { Router } from '@angular/router';
+import { StorageService } from '../../services/storage.service';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +20,7 @@ export class LoginPage implements OnInit {
 
   form!:FormGroup
 
-  constructor(private router: Router) { }
+  constructor(private router: Router,private storageService: StorageService) { }
 
   ngOnInit() {
     this.form = new FormGroup({
@@ -35,7 +36,7 @@ export class LoginPage implements OnInit {
     })
   }
 
-  validar(){
+  async validar(){
     if(this.form.invalid){
       this.form.markAllAsTouched();
       return
@@ -43,7 +44,13 @@ export class LoginPage implements OnInit {
     const {email,password} = this.form.value
     console.log("Email",email)
     console.log("password",password)
-    this.router.navigate(['/listar-cocteles'])
+    const isValid = await this.storageService.loginUser(email,password)
+    if(isValid){
+      this.router.navigate(['/listar-cocteles'])
+    }else{
+      console.log("Usuario no existe")
+    }
+
   }
 
   goToRegister(){
